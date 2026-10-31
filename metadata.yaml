@@ -1,6 +1,9 @@
-name: astrbot_plugin_memory
+name: astrbot_plugin_memnotery
 display_name: Memnotery
 desc: 会话记忆、提示记忆与垃圾箱管理插件
-version: 0.2.0
-author: GLM & GPT-5.4
-repo: https://github.com/
+version: 1.5
+author: GLM & GPT & Qwen
+repo: https://github.com/atri0828lqxc-bot/astrbot_plugin_memnotery.git
+tages: 长期记忆，页面管理
+yaml: aiocqhttp
+astrbot_version: ">=4.27.0"
