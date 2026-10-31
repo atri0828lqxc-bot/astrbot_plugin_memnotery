@@ -1,0 +1,353 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Memnotery 记忆管理</title>
+  <style>
+    :root{font:14px/1.5 system-ui,sans-serif;color:#263c39;background:#eef8f3}*{box-sizing:border-box}body{margin:0;padding:20px;padding-right:186px;max-width:1240px;margin-inline:auto}header{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}h1{font-size:20px;margin:0}button,input,select,textarea{font:inherit}button{border:1px solid #7fd4ae;background:#fff;color:#1d6b4f;border-radius:8px;padding:7px 11px;cursor:pointer;font-weight:600;box-shadow:0 0 6px #39ff1440;transition:background .18s,box-shadow .18s,transform .18s}button:hover:not(:disabled){background:#f0fff5;box-shadow:0 0 12px #39ff14a6;transform:translateY(-1px)}button:focus-visible{outline:none;box-shadow:0 0 12px #39ff14b3}button:disabled{opacity:.45;cursor:not-allowed;box-shadow:none}.danger{border-color:#f3a6a6;color:#b52f39;background:#fff5f5;box-shadow:0 0 6px #ff3b3b33}.danger:hover:not(:disabled){background:#ffecec;box-shadow:0 0 12px #ff3b3b8c}.primary{border-color:#39ff14;color:#0b2b1f;background:#eaffea;box-shadow:0 0 9px #39ff1473}.primary:hover:not(:disabled){background:#d9ffd9;box-shadow:0 0 15px #39ff14cc}input,select,textarea{border:1px solid #b9d9ce;border-radius:8px;padding:7px 9px;background:white}textarea{width:100%;min-height:82px;resize:vertical}.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0}.toolbar input{min-width:180px}.selection-actions{display:none;gap:8px;align-items:center;flex-wrap:wrap;width:100%;padding:8px 0}.selection-actions.visible{display:flex}.table-wrap{overflow:auto;background:#fff;border:1px solid #cce4da;border-radius:10px;box-shadow:0 4px 16px #2f8f6b12}table{width:100%;border-collapse:collapse;min-width:820px}th,td{text-align:left;padding:9px 10px;border-bottom:1px solid #e1eee9;vertical-align:top}th{background:#e2f3eb;font-weight:600}td.content{white-space:pre-wrap;max-width:460px}.actions{display:flex;gap:5px;flex-wrap:wrap}.muted{color:#55736b}.status{margin:10px 0;min-height:20px;color:#b52f39}.editor{position:fixed;inset:0;background:#0006;display:none;align-items:center;justify-content:center;padding:16px}.dialog{width:min(620px,100%);background:#fff;border-radius:10px;padding:18px;display:grid;gap:10px}.dialog h2{font-size:17px;margin:0}.dialog footer{display:flex;justify-content:flex-end;gap:8px}.field{display:grid;gap:4px;font-size:12.5px;color:#55736b;font-weight:600}.field input,.field textarea,.field select{font-weight:400;color:#263c39}.field-row{display:flex;gap:10px;flex-wrap:wrap}.field-row .field{flex:1}.check-list{display:grid;gap:6px;max-height:190px;overflow:auto;border:1px solid #b9d9ce;border-radius:8px;padding:8px}.check-list label{display:flex;gap:8px;align-items:center;font-weight:400;color:#263c39;font-size:13px;cursor:pointer}.check-list label:hover{background:#f0fff5}.mode-row .mode{display:flex;gap:6px;align-items:center;font-weight:600;color:#1d6b4f;font-size:13px;cursor:pointer;padding:4px 2px}.fmt{margin:12px 0 0;border:1px solid #cce4da;border-radius:8px;background:#f7fcfa;padding:10px 14px;font-size:13px}.fmt summary{cursor:pointer;font-weight:700;color:#1d6b4f;user-select:none}.fmt-body{margin-top:10px;display:flex;flex-direction:column;gap:6px}.fmt-body p{margin:0}.fmt pre{margin:2px 0 4px;padding:8px 12px;background:#0d2b21;color:#7dffb0;border-radius:6px;font-size:12px;line-height:1.6;overflow-x:auto;white-space:pre-wrap;word-break:break-all;font-family:Consolas,'Courier New',monospace}.ai-progress{display:grid;gap:5px}.ai-progress.hidden{display:none}.ai-progress-track{height:10px;border-radius:6px;background:#e2f3eb;border:1px solid #b9d9ce;overflow:hidden}.ai-progress-fill{height:100%;width:0%;background:linear-gradient(90deg,#39ff14,#2f8f6b);box-shadow:0 0 8px #39ff14a0;border-radius:6px;transition:width .3s ease}.ai-progress-fill.indet{width:40%;animation:indetslide 1.1s ease-in-out infinite alternate}@keyframes indetslide{from{margin-left:-40%}to{margin-left:100%}}.hint{font-size:12px;color:#55736b;font-weight:400}.add-panel .hint{flex-basis:100%}.tag{color:#12614b}.hidden{display:none}.group-panel{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:10px 0;padding:10px;border:1px solid #cce4da;border-radius:8px;background:#f7fcfa}.group-panel select{min-width:220px}.add-panel{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:0;padding:12px;border-bottom:1px solid #cce4da;background:#f7fcfa;min-width:820px}.add-panel textarea{flex:1 1 100%;min-height:56px;resize:vertical}.add-panel input[type=number]{width:74px}.add-panel input#addTags{min-width:190px;flex:1}.toasts{position:fixed;top:16px;right:16px;display:flex;flex-direction:column;gap:8px;z-index:80;max-width:340px}.toast{padding:10px 14px;border-radius:8px;color:#fff;box-shadow:0 6px 18px #00000026;font-size:13px;animation:slidein .28s ease}.toast.ok{background:#2f8f6b}.toast.bad{background:#b52f39}.toast.gone{opacity:0;transform:translateX(14px);transition:opacity .32s,transform .32s}@keyframes slidein{from{opacity:0;transform:translateX(18px)}to{opacity:1;transform:none}}.log-panel{margin:14px 0 28px;border:1px solid #cce4da;border-radius:8px;background:#f7fcfa}.log-head{display:flex;justify-content:space-between;align-items:center;padding:8px 12px}.log-head button{padding:3px 10px;font-size:12.5px}#logList{margin:0;padding:2px 14px 10px;list-style:none;max-height:170px;overflow:auto;font-size:12.5px}#logList li{padding:2.5px 0;border-bottom:1px dashed #dceee6;white-space:pre-wrap;word-break:break-word}#logList li.ok{color:#1d6b4f}#logList li.bad{color:#b52f39;font-weight:600}#logList li:empty{display:none}@media(max-width:600px){body{padding:14px;padding-right:164px}.toolbar>*{flex:1}}.toolbar.trash-mode{justify-content:center}.toolbar.trash-mode .trash-hide{display:none}.toolbar.trash-mode #trash,.toolbar.trash-mode #purge{animation:fadein .32s ease}.group-panel{transition:opacity .22s ease}.group-panel.panel-hide{display:none}.selection-actions.visible{animation:fadein .25s ease}@keyframes fadein{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}.page{display:none;animation:fadein .26s ease}.page.active{display:block}.page-card{background:#fff;border:1px solid #cce4da;border-radius:10px;box-shadow:0 4px 16px #2f8f6b12;padding:16px;display:grid;gap:12px;margin:16px 0}.page-card h2{margin:0;font-size:17px}.io-row{display:flex;gap:8px;flex-wrap:wrap}.drawer{position:fixed;top:0;right:0;height:100%;z-index:60}.drawer-body{position:fixed;top:0;right:0;height:100%;width:150px;background:#fff;border-left:2px solid #2f8f6b;box-shadow:-4px 0 16px #2f8f6b1f;display:flex;flex-direction:column;gap:8px;padding:56px 10px 14px;z-index:60}.drawer-item{background:#fff;border:1px solid #b9d9ce;color:#1d6b4f;border-radius:8px;padding:10px 8px;text-align:left;font-weight:600;transition:background .18s,box-shadow .18s}.drawer-item:hover{background:#e6f5ee}.drawer-item.active{background:#39ff14;border-color:#39ff14;color:#0b2b1f;box-shadow:0 0 12px #39ff1480}.page-card .log-panel{margin:0}
+  </style>
+</head>
+<body>
+  <header><h1>Memnotery 记忆管理</h1><span class="muted" id="count"></span></header>
+  <main class="page active" id="page-mem">
+  <div class="toolbar" id="toolbar">
+    <select id="scope"><option value="">选择会话</option></select>
+    <select id="kind" class="trash-hide"><option value="">全部类型</option><option value="prompt">提示记忆</option><option value="long">长期记忆</option></select>
+    <input id="query" class="trash-hide" placeholder="搜索正文或标签">
+    <button id="newSession" class="primary trash-hide">新建会话</button><button id="renameSession" class="trash-hide">重命名</button><button id="deleteSession" class="danger trash-hide">删除会话</button>
+    <button id="trash">查看垃圾箱</button><button id="purge" class="danger hidden">清空垃圾箱</button>
+    <div class="selection-actions trash-hide" id="selectionActions"><span id="selectedCount" class="muted"></span><button id="batchDelete" class="danger">移入垃圾箱</button><button id="purgeSelected" class="danger hidden">永久删除所选</button><select id="moveTarget" aria-label="迁移目标会话"></select><button id="batchMove" class="primary">迁移所选</button></div>
+  </div>
+  <div class="status" id="status" role="status"></div>
+  <div class="table-wrap">
+    <div class="add-panel"><strong>添加记忆</strong><select id="addKind" aria-label="记忆类型" title="提示记忆会注入每轮对话，长期记忆按需检索"><option value="long">长期记忆</option><option value="prompt">提示记忆</option></select><input id="addTags" placeholder="标签，多个用逗号分隔，可留空" title="用于按标签检索长期记忆"><input id="addStar" type="number" min="0" max="5" value="0" aria-label="级别" title="重要程度 0-5，数字越大越重要"><input id="addTime" type="datetime-local" aria-label="记录时间" title="留空则自动使用当前时间"><textarea id="addContent" placeholder="记忆内容：一条简洁的事实描述，例如：用户偏好简洁的回复风格"></textarea><button id="addSave" class="primary">添加记忆</button><span class="hint">时间留空将自动写入当前时间；级别 0-5，数字越大越重要；提示记忆每轮对话自动注入，长期记忆通过检索使用</span></div>
+    <table><thead><tr><th><input type="checkbox" id="selectAll" aria-label="全选当前列表"></th><th>序号</th><th>时间</th><th>类型</th><th>标签</th><th>内容</th><th>级别</th><th>操作</th></tr></thead><tbody id="rows"></tbody></table>
+  </div>
+  </main>
+  <section class="page" id="page-session">
+    <div class="page-card">
+      <h2>会话关联</h2>
+      <span class="hint">关联：选定的两个会话合并为统一记忆池，双方记忆互通，新增记忆同步写入两个会话。解除：成员退出关联组，并为它保留当前记忆快照。全部在弹窗中完成选择，无需先回到首页。</span>
+      <div class="group-panel" id="groupPanel"><button id="linkGroup" class="primary">关联会话</button><button id="unlinkGroup" class="danger">解除关联</button><span id="groupMembers" class="muted"></span></div>
+    </div>
+  </section>
+  <section class="page" id="page-io">
+    <div class="page-card">
+      <h2>导入导出</h2>
+      <span class="hint">导出当前所选会话的全部记忆（含垃圾箱）为 JSON 文件，可自定义文件名；直接导入支持本插件格式与旧插件格式（自动修复常见 JSON 错误、按内容去重）；AI 智能导入需在插件配置中开启 enable_ai_import，使用的模型供应商与工作提示词可在「AI 配置」中调整。</span>
+      <div class="io-row"><button id="export" class="primary">导出 JSON</button><button id="import">导入 JSON</button><button id="aiImport" class="primary">AI 智能导入</button><button id="aiCfg">AI 配置</button><input class="hidden" id="file" type="file" accept="application/json,.json,.txt"></div>
+      <details class="fmt"><summary>手动导入支持哪些文件格式？点此展开说明</summary><div class="fmt-body">
+        <p><b>① 本插件格式（推荐）</b>：顶层 <code>items</code>，字段 content 内容、star 重要程度 0-5、tags 标签（可省略）、time 时间（可省略，省略时取导入时刻）</p>
+        <pre>{"items": [{"content": "她喜欢在雨天喝热可可", "star": 4, "tags": ["饮食", "喜好"], "time": "2026-10-04 13:05:44"}]}</pre>
+        <p><b>② 旧插件格式（自动识别）</b>：每个键是一个会话名，导入后按文件内的会话名分组建会话</p>
+        <pre>{"樱的回忆": [{"content": "记忆内容", "importance": 3, "timestamp": "2026-10-04 13:05:44"}]}</pre>
+        <p><b>③ 纯数组</b>：没有会话分组时，将导入到弹窗中选择的目标会话</p>
+        <pre>[{"content": "记忆内容", "star": 3}]</pre>
+        <p><b>④ 旧 AstrBot 备份格式（自动识别）</b></p>
+        <pre>{"core_memory": ["记忆一", "记忆二"], "medium_term": ["..."], "long_term": ["..."]}</pre>
+        <p class="hint">全角引号、尾随逗号、缺少闭合括号等常见 JSON 错误会自动修复；导入时按内容自动去重；时间按本机时区换算为 UTC 存储，页面显示时转回本地时间。不想整理格式？直接用「AI 智能导入」粘贴任意文本即可。</p>
+      </div></details>
+    </div>
+  </section>
+  <section class="page" id="page-log">
+    <div class="page-card">
+      <h2>操作日志</h2>
+      <div class="io-row"><button id="refresh" class="primary">刷新数据</button></div>
+      <div class="log-panel"><div class="log-head"><strong>最近操作</strong><span class="muted">仅记录本页面操作，与 AstrBot 后端日志相互独立</span><button id="logClear">清空日志</button></div><ul id="logList"></ul></div>
+    </div>
+  </section>
+  <div class="editor" id="importBox"><section class="dialog"><h2>导入记忆 → 目标会话</h2><div class="io-row mode-row"><label class="mode"><input type="radio" name="importMode" value="new" checked>创建新会话</label><label class="mode"><input type="radio" name="importMode" value="exist">补充到现有会话</label></div><label class="field" id="importNewRow">新会话名称<input id="importNewName" placeholder="例如：樱咲的回忆"></label><label class="field hidden" id="importExistRow">目标会话（新记忆补充到该会话末尾）<select id="importExist" class="field"></select></label><span class="hint">旧格式文件自带会话分组时会按文件内的会话名导入；数组或无分组文件将导入到上面的目标会话。</span><footer><button id="importCancel">取消</button><button id="importGo" class="primary">开始导入</button></footer></section></div>
+  <div class="editor" id="aiBox"><section class="dialog"><h2>AI 智能导入</h2><label class="field">粘贴任意格式的记忆文本（聊天记录、旧插件导出、纯文本均可）<textarea id="aiText" rows="8" placeholder="支持任意格式：AI 会识别每条记忆，内容保持原文不变，只判断时间、标签与重要程度（0-5）"></textarea></label><div class="io-row mode-row"><label class="mode"><input type="radio" name="aiMode" value="new" checked>创建新会话</label><label class="mode"><input type="radio" name="aiMode" value="exist">补充到现有会话</label></div><label class="field" id="aiNewRow">新会话名称<input id="aiNewName" placeholder="例如：千昼的回忆"></label><label class="field hidden" id="aiExistRow">目标会话<select id="aiExist" class="field"></select></label><div class="ai-progress hidden" id="aiProgress"><div class="ai-progress-track"><div class="ai-progress-fill" id="aiProgressFill"></div></div><span class="hint" id="aiProgressText"></span></div><span class="hint">调用当前配置的 LLM 解析，需在插件配置中开启 enable_ai_import；解析后按内容去重，原文严禁改动。</span><footer><button id="aiCancel">取消</button><button id="aiGo" class="primary">AI 解析并导入</button></footer></section></div>
+  <div class="editor" id="aiCfgBox"><section class="dialog"><h2>AI 配置（智能导入）</h2><label class="field">模型供应商<select id="aiCfgProvider" class="field"></select></label><label class="field">工作提示词（留空使用内置默认；须要求 AI 输出固定 JSON 数组格式，且严禁更改记忆原文）<textarea id="aiCfgPrompt" rows="9" placeholder="留空 = 使用内置默认提示词"></textarea></label><span class="hint" id="aiCfgHint">内置默认提示词会要求 AI 按「内容（严禁改动）+ 重要程度 0-5 + 标签 + 时间」的固定格式输出。</span><footer><button id="aiCfgCancel">取消</button><button id="aiCfgSave" class="primary">保存配置</button></footer></section></div>
+  <nav class="drawer" id="drawer"><div class="drawer-body"><button class="drawer-item active" data-page="page-mem">记忆管理</button><button class="drawer-item" data-page="page-session">会话关联</button><button class="drawer-item" data-page="page-io">导入导出</button><button class="drawer-item" data-page="page-log">日志</button></div></nav>
+  <div class="editor" id="editor"><section class="dialog"><h2>编辑记忆 #<span id="editTitle">-</span></h2><label class="field">记忆内容（一条简洁的事实描述）<textarea id="editContent" aria-label="记忆内容"></textarea></label><label class="field">标签（多个用逗号分隔，用于按标签检索长期记忆）<input id="editTags" aria-label="标签"></label><div class="field-row"><label class="field">级别（0-5，越大越重要）<input id="editStar" type="number" min="0" max="5" aria-label="级别"></label><label class="field">记录时间（留空保持原时间不变）<input id="editTime" type="datetime-local" aria-label="记录时间"></label></div><footer><button id="cancel">取消</button><button id="save" class="primary">保存</button></footer></section></div>
+  <div class="editor" id="saveBox"><section class="dialog"><h2>导出记忆 → 另存为</h2><label class="field">保存文件名<input id="saveName" aria-label="保存文件名"></label><span class="hint">确认后浏览器将下载该 JSON 文件；若浏览器设置了"每次下载都询问保存位置"，会弹出系统另存为窗口选择目录。</span><footer><button id="saveCancel">取消</button><button id="saveGo" class="primary">开始导出</button></footer></section></div>
+  <div class="editor" id="confirmBox"><section class="dialog"><h2 id="confirmText">确认操作</h2><footer><button id="confirmNo">取消</button><button id="confirmYes" class="danger">确定</button></footer></section></div>
+  <div class="editor" id="promptBox"><section class="dialog"><h2 id="promptTitle">输入</h2><label class="field">名称<input id="promptInput" aria-label="名称" maxlength="50"></label><span class="hint">名称将显示在会话下拉列表中，最长 50 字。</span><footer><button id="promptCancel">取消</button><button id="promptOk" class="primary">确定</button></footer></section></div>
+  <div class="editor" id="shareBox"><section class="dialog"><h2>关联会话 → 统一记忆池</h2><label class="field">要关联的会话（可多选，其全部记忆将合并到目标）<div id="shareList" class="check-list"></div></label><label class="field">目标会话（记忆合并到这里，此后互通）<select id="shareTarget" class="field"></select></label><span class="hint">合并后所有选中会话与目标会话记忆互通，新增记忆同步写入各方；源会话不再保留独立记忆。</span><footer><button id="shareCancel">取消</button><button id="shareGo" class="primary">确定关联</button></footer></section></div>
+  <div class="editor" id="unshareBox"><section class="dialog"><h2>解除关联</h2><label class="field">要解除关联的会话<select id="unshareMember" class="field"></select></label><span class="hint">解除后该会话退出关联组，并保留解除时刻的记忆快照，不再与组内其他会话互通。</span><footer><button id="unshareCancel">取消</button><button id="unshareGo" class="primary">确定解除</button></footer></section></div>
+  <div class="toasts" id="toasts" aria-live="polite"></div>
+  <script type="module">
+    const bridge = window.AstrBotPluginPage;
+    function withTimeout(promise, ms, label){return Promise.race([promise,new Promise((_,rej)=>setTimeout(()=>rej(new Error(`${label||'请求'}超时（页面桥无响应），请刷新页面后重试`)),ms))]);}
+    const apiGet = (path, params) => withTimeout(bridge.apiGet(path, params), 10000, '加载');
+    const apiPost = (path, data) => withTimeout(bridge.apiPost(path, data), 90000, '提交');
+    const $ = (id) => document.getElementById(id);
+    let trashMode = false, editing = null, confirmResolve = null, sessionList = [], groupList = [];
+    const status = (message) => { $('status').textContent = message; };
+    function pushToast(text, ok = true){
+      const box = document.createElement('div');
+      box.className = 'toast ' + (ok ? 'ok' : 'bad');
+      box.textContent = text;
+      $('toasts').append(box);
+      setTimeout(() => { box.classList.add('gone'); setTimeout(() => box.remove(), 350); }, 3200);
+    }
+    function log(text, ok = true){
+      const li = document.createElement('li');
+      li.className = ok ? 'ok' : 'bad';
+      li.textContent = `[${new Date().toLocaleTimeString()}] ${text}`;
+      $('logList').prepend(li);
+      while ($('logList').children.length > 50) $('logList').lastChild.remove();
+    }
+    function confirmDialog(message){
+      $('confirmText').textContent = message;
+      $('confirmBox').style.display = 'flex';
+      return new Promise((resolve) => { confirmResolve = resolve; });
+    }
+    $('confirmYes').onclick = () => { $('confirmBox').style.display = 'none'; if (confirmResolve) confirmResolve(true); };
+    $('confirmNo').onclick = () => { $('confirmBox').style.display = 'none'; if (confirmResolve) confirmResolve(false); };
+    $('logClear').onclick = () => { $('logList').replaceChildren(); };
+    const scope = () => $('scope').value.trim();
+    for (const item of document.querySelectorAll('.drawer-item')) item.onclick = () => {
+      for (const other of document.querySelectorAll('.drawer-item')) other.classList.toggle('active', other === item);
+      for (const page of document.querySelectorAll('.page')) page.classList.toggle('active', page.id === item.dataset.page);
+      status('');
+    };
+    const sessionLabel = (item) => item.alias ? `${item.alias}（${item.scope.length>24?item.scope.slice(0,24)+'…':item.scope}）` : item.scope;
+    function fillSessionSelect(sel, items){
+      sel.replaceChildren(new Option('选择会话',''));
+      for (const item of items) sel.add(new Option(sessionLabel(item), item.scope));
+    }
+    let promptResolve = null;
+    function promptDialog(title, value){
+      $('promptTitle').textContent = title; $('promptInput').value = value || '';
+      $('promptBox').style.display = 'flex';
+      return new Promise(resolve => { promptResolve = resolve; setTimeout(()=>$('promptInput').focus(),50); });
+    }
+    $('promptOk').onclick = () => { $('promptBox').style.display = 'none'; if (promptResolve) promptResolve($('promptInput').value.trim()); };
+    $('promptCancel').onclick = () => { $('promptBox').style.display = 'none'; if (promptResolve) promptResolve(null); };
+    $('promptInput').onkeydown = (e) => { if (e.key === 'Enter') $('promptOk').click(); };
+    const checkedSources = () => [...$('shareList').querySelectorAll('input:checked')].map(box => box.value);
+    $('linkGroup').onclick = () => {
+      if (!sessionList.length) return pushToast('暂无可关联的会话，请先新建或使用至少一个会话', false);
+      const list = $('shareList'); list.replaceChildren();
+      for (const item of sessionList) {
+        const row = document.createElement('label');
+        const box = document.createElement('input'); box.type = 'checkbox'; box.value = item.scope;
+        row.appendChild(box); row.appendChild(document.createTextNode(sessionLabel(item)));
+        list.appendChild(row);
+      }
+      fillSessionSelect($('shareTarget'), sessionList);
+      $('shareBox').style.display = 'flex';
+    };
+    $('shareList').onchange = () => {
+      const picked = checkedSources(), current = $('shareTarget').value;
+      fillSessionSelect($('shareTarget'), sessionList.filter(item => !picked.includes(item.scope)));
+      if (![...$('shareTarget').options].some(option => option.value === current)) $('shareTarget').value = '';
+      else $('shareTarget').value = current;
+    };
+    $('shareCancel').onclick = () => { $('shareBox').style.display = 'none'; };
+    $('shareGo').onclick = async () => {
+      const sources = checkedSources(), target = $('shareTarget').value;
+      if (!sources.length || !target) return pushToast('请至少勾选一个要关联的会话，并选择目标会话', false);
+      $('shareBox').style.display = 'none';
+      if (!await confirmDialog(`把 ${sources.length} 个会话（${sources.join('、')}）的全部记忆合并到「${target}」，此后全部互通。是否继续？`)) return;
+      let done = 0;
+      for (const source of sources) {
+        try { await apiPost('api/share', { scope: source, target }); done++; log(`已关联：${source} → ${target}`); }
+        catch (e) { log(`关联失败：${source} → ${e.message || e}`, false); }
+      }
+      pushToast(done === sources.length ? `已关联 ${done} 个会话到「${target}」，记忆互通` : `完成 ${done}/${sources.length}，部分失败，详见日志`, done === sources.length);
+      await loadSessions();
+    };
+    $('unlinkGroup').onclick = () => {
+      if (!groupList.length) return pushToast('当前没有关联中的会话', false);
+      fillSessionSelect($('unshareMember'), sessionList.filter(item => groupList.includes(item.scope)));
+      $('unshareBox').style.display = 'flex';
+    };
+    $('unshareCancel').onclick = () => { $('unshareBox').style.display = 'none'; };
+    $('unshareGo').onclick = async () => {
+      const member = $('unshareMember').value;
+      if (!member) return pushToast('请选择要解除关联的会话', false);
+      $('unshareBox').style.display = 'none';
+      if (!await confirmDialog('解除该会话关联，并为它保留当前记忆快照？')) return;
+      try { await apiPost('api/unshare', { scope: member, member }); pushToast('已解除关联'); log(`已解除 ${member} 的关联，保留记忆快照`); await loadSessions(); }
+      catch (e) { const msg = `解除关联失败：${e.message || e}`; pushToast(msg, false); log(msg, false); }
+    };
+    async function loadSessions(){
+      try {
+        const current = scope();
+        const data = await apiGet('api/sessions',{scope:current});
+        const label = (item) => item.alias ? `${item.alias}（${item.scope.length>24?item.scope.slice(0,24)+'…':item.scope}）` : item.scope;
+        const select = $('scope'); select.replaceChildren(new Option('选择会话',''));
+        for(const item of data.sessions || []) select.add(new Option(label(item),item.scope));
+        if (current && [...select.options].some(option => option.value === current)) select.value = current;
+        if (!scope() && select.options.length === 2) select.value = select.options[1].value;
+        sessionList = data.sessions || []; groupList = data.group || [];
+        const others = sessionList.filter(item=>item.scope!==scope());
+        const mt=$('moveTarget');mt.replaceChildren(new Option('选择会话',''));for(const item of others)mt.add(new Option(label(item),item.scope));
+        $('groupMembers').textContent=groupList.length>1?`已关联：${groupList.join('、')}`:'未关联';
+        await load();
+      } catch (error) {
+        status(`加载会话失败：${error.message || error}`);
+      }
+    }
+    function selectedRows(){return [...$('rows').querySelectorAll('input[type=checkbox]:checked')].map(box=>Number(box.value));}
+    function updateSelection(){const boxes=[...$('rows').querySelectorAll('input[type=checkbox]')];const checked=boxes.filter(box=>box.checked).length;$('selectAll').checked=boxes.length>0&&checked===boxes.length;$('selectAll').indeterminate=checked>0&&checked<boxes.length;$('selectionActions').classList.toggle('visible',checked>0);$('selectedCount').textContent=checked?`已选择 ${checked} 条`:'';$('batchDelete').textContent=trashMode?'恢复所选':'移入垃圾箱';$('batchDelete').classList.toggle('danger',!trashMode);$('batchDelete').classList.toggle('primary',trashMode);$('purgeSelected').classList.toggle('hidden',!trashMode);$('batchMove').hidden=trashMode;$('moveTarget').hidden=trashMode;}
+    $('selectAll').onchange=()=>{for(const box of $('rows').querySelectorAll('input[type=checkbox]'))box.checked=$('selectAll').checked;updateSelection();};
+    $('batchDelete').onclick=async()=>{const rowIds=selectedRows();if(!rowIds.length)return;try{if(trashMode){const result=await apiPost('api/restore',{scope:scope(),ids:rowIds});pushToast(`已恢复 ${result.restored} 条`);log(`批量恢复 ${result.restored} 条记忆`);await load();}else{const result=await apiPost('api/delete',{scope:scope(),row_ids:rowIds});pushToast(`已移入垃圾箱 ${result.deleted} 条`);log(`批量移入垃圾箱 ${result.deleted} 条记忆`);await load();}}catch(e){const msg=`批量操作失败：${e.message||e}`;pushToast(msg,false);log(msg,false);}};
+    $('purgeSelected').onclick=async()=>{const rowIds=selectedRows();if(!rowIds.length)return;if(!await confirmDialog(`确定永久删除垃圾箱中的 ${rowIds.length} 条记忆？此操作不可撤销。`))return;try{const result=await apiPost('api/purge-selected',{scope:scope(),row_ids:rowIds});pushToast(`已永久删除 ${result.deleted} 条`);log(`永久删除 ${result.deleted} 条垃圾记忆`);await load();}catch(e){const msg=`永久删除失败：${e.message||e}`;pushToast(msg,false);log(msg,false);}};
+    $('batchMove').onclick=async()=>{const target=$('moveTarget').value,rowIds=selectedRows();if(!target)return pushToast('请选择迁移目标会话',false);if(!rowIds.length)return;try{const result=await apiPost('api/migrate-selected',{scope:scope(),target,row_ids:rowIds});pushToast(`已迁移 ${result.moved} 条记忆`);log(`迁移 ${result.moved} 条记忆 → ${target}`);await load();}catch(e){const msg=`迁移失败：${e.message||e}`;pushToast(msg,false);log(msg,false);}};
+    $('newSession').onclick=async()=>{const alias=await promptDialog('新建会话：请输入会话名称','');if(!alias)return;try{const result=await apiPost('api/session/create',{alias});pushToast(`已创建会话「${alias}」`);log(`新建会话 ${alias}（${result.scope}）`);await loadSessions();$('scope').value=result.scope;await load();}catch(e){const msg=`新建会话失败：${e.message||e}`;pushToast(msg,false);log(msg,false);}};
+    $('renameSession').onclick=async()=>{if(!scope())return pushToast('请先选择会话',false);const current=[...$('scope').options].find(option=>option.value===scope());const alias=await promptDialog('重命名会话',current?current.textContent.split('（')[0]:'');if(!alias)return;try{await apiPost('api/session/rename',{scope:scope(),alias});pushToast('已重命名');log(`会话 ${scope()} 重命名为「${alias}」`);await loadSessions();}catch(e){const msg=`重命名失败：${e.message||e}`;pushToast(msg,false);log(msg,false);}};
+    $('deleteSession').onclick=async()=>{if(!scope())return pushToast('请先选择会话',false);const s=scope();if(!await confirmDialog(`删除会话「${s}」？仅允许删除没有任何记忆的空白会话。`))return;try{await apiPost('api/session/delete',{scope:s});pushToast('会话已删除');log(`删除空白会话 ${s}`);$('scope').value='';await loadSessions();}catch(e){const msg=`删除会话失败：${e.message||e}`;pushToast(msg,false);log(msg,false);}};
+    async function load(){
+      if(!scope()){ $('rows').replaceChildren(); $('count').textContent=''; updateSelection(); return; }
+      try {
+        const params = new URLSearchParams({scope:scope(),q:$('query').value,trash:String(trashMode)});
+        if($('kind').value) params.set('kind',$('kind').value);
+        const data = await apiGet('api/list', Object.fromEntries(params));
+        $('count').textContent = `${(data.items||[]).length} 条`;
+        const body=$('rows'); body.replaceChildren(); $('selectAll').checked=false;
+        for(const item of data.items||[]){
+          const tr=document.createElement('tr');
+          const selectCell=document.createElement('td'), checkbox=document.createElement('input');checkbox.type='checkbox';checkbox.value=item.row_id;checkbox.setAttribute('aria-label',`选择记忆 ${item.id}`);checkbox.onchange=updateSelection;selectCell.append(checkbox);tr.append(selectCell);
+          const values=[item.id,item.time,item.kind==='prompt'?'提示':'长期',item.tags.join(', '),item.context,item.star];
+          for(let i=0;i<values.length;i++){const td=document.createElement('td');td.textContent=values[i];if(i===3)td.className='tag';if(i===4)td.className='content';tr.append(td);}
+          const actions=document.createElement('td'), group=document.createElement('div');group.className='actions';
+          if(trashMode){const restore=document.createElement('button');restore.textContent='恢复';restore.onclick=()=>act('api/restore',{scope:scope(),id:item.id,row_id:item.row_id},'已恢复');group.append(restore);}
+          else {const edit=document.createElement('button');edit.textContent='编辑';edit.onclick=()=>openEditor(item);group.append(edit);const del=document.createElement('button');del.textContent='移入垃圾箱';del.onclick=()=>act('api/delete',{scope:scope(),id:item.id},'已移入垃圾箱');group.append(del);}
+          actions.append(group);tr.append(actions);body.append(tr);
+        }
+        updateSelection();status('');
+      } catch (error) {
+        status(`加载记忆失败：${error.message || error}`);
+      }
+    }
+    async function act(endpoint,data,message){try{const result=await apiPost(endpoint,data);pushToast(message||'操作成功');log(message||'操作成功');await load();return result;}catch(e){const msg=`操作失败：${e.message||e}`;pushToast(msg,false);log(msg,false);}}
+    const toLocalInput = (value) => { const d = value ? new Date(value) : null; if (!d || isNaN(d)) return ''; const p = (n) => String(n).padStart(2, '0'); return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`; };
+    const toIso = (value) => value ? new Date(value).toISOString() : new Date().toISOString();
+    function openEditor(item){editing=item;$('editTitle').textContent=item.id;$('editContent').value=item.context;$('editTags').value=item.tags.join(',');$('editStar').value=item.star;$('editTime').value=toLocalInput(item.time);$('editor').style.display='flex';}
+    $('save').onclick=async()=>{await act('api/update',{scope:scope(),id:editing.id,context:$('editContent').value,tags:$('editTags').value.split(',').map(x=>x.trim()).filter(Boolean),star:Number($('editStar').value),time:toIso($('editTime').value||editing.time)},'已保存');$('editor').style.display='none';};
+    $('cancel').onclick=()=>$('editor').style.display='none';
+    $('refresh').onclick=load;$('scope').onchange=()=>{loadSessions();};$('kind').onchange=load;$('query').onkeydown=(e)=>{if(e.key==='Enter')load();};
+    $('trash').onclick=async()=>{trashMode=!trashMode;$('trash').textContent=trashMode?'返回记忆':'查看垃圾箱';$('trash').classList.toggle('primary',trashMode);$('toolbar').classList.toggle('trash-mode',trashMode);$('groupPanel').classList.toggle('panel-hide',trashMode);$('purge').classList.toggle('hidden',!trashMode);$('selectAll').checked=false;updateSelection();await load();};
+    $('purge').onclick=async()=>{if(!scope())return;if(!await confirmDialog('永久删除当前会话的全部垃圾记忆？此操作不可撤销。'))return;try{const result=await apiPost('api/purge',{scope:scope()});pushToast(`垃圾箱已清空（${result.deleted} 条）`);log(`清空垃圾箱 ${result.deleted} 条记忆`);await load();}catch(e){const msg=`清空垃圾箱失败：${e.message||e}`;pushToast(msg,false);log(msg,false);}};
+    $('export').onclick=()=>{const stamp=new Date().toISOString().slice(0,16).replace(/[-:T]/g,'').slice(0,12);const s=scope()?scope().replace(/[^a-zA-Z0-9_-]+/g,'-').slice(0,30):'session';$('saveName').value=`memories-${s}-${stamp}.json`;$('saveBox').style.display='flex';};
+    $('saveCancel').onclick=()=>$('saveBox').style.display='none';
+    $('saveGo').onclick=async()=>{try{const data=await apiGet('api/export',{scope:scope()});const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(data.items,null,2)],{type:'application/json'}));a.download=($('saveName').value.trim()||'memories.json');a.click();URL.revokeObjectURL(a.href);$('saveBox').style.display='none';pushToast(`已导出 ${(data.items||[]).length} 条`);log(`导出 ${(data.items||[]).length} 条记忆 → ${a.download}`);}catch(e){const msg=`导出失败：${e.message||e}`;pushToast(msg,false);log(msg,false);}};
+    let pendingRaw = null;
+    function bindModeSwitch(radioName, newRowId, existRowId){
+      const radios = document.getElementsByName(radioName);
+      const sync = () => {
+        const value = [...radios].find(r => r.checked).value;
+        $(newRowId).classList.toggle('hidden', value !== 'new');
+        $(existRowId).classList.toggle('hidden', value !== 'exist');
+      };
+      for (const radio of radios) radio.onchange = sync;
+      sync();
+    }
+    function pickScope(newRowId, existSelectId, modeName){
+      const radios = document.getElementsByName(modeName);
+      const value = [...radios].find(r => r.checked).value;
+      if (value === 'new') return {mode: 'new', name: $(newRowId === 'importNewRow' ? 'importNewName' : 'aiNewName').value.trim()};
+      return {mode: 'exist', scope: $(existSelectId).value};
+    }
+    function fillImportSelects(){
+      fillSessionSelect($('importExist'), sessionList);
+      fillSessionSelect($('aiExist'), sessionList);
+    }
+    bindModeSwitch('importMode', 'importNewRow', 'importExistRow');
+    bindModeSwitch('aiMode', 'aiNewRow', 'aiExistRow');
+    $('import').onclick=()=>$('file').click();
+    $('file').onchange=async(e)=>{const f=e.target.files[0];if(!f)return;try{pendingRaw=await f.text();$('importNewName').value='';fillImportSelects();$('importBox').style.display='flex';}catch(err){pushToast(`读取文件失败：${err.message||err}`,false);}e.target.value='';};
+    $('importCancel').onclick=()=>{$('importBox').style.display='none';pendingRaw=null;};
+    $('importGo').onclick=async()=>{
+      if(pendingRaw===null)return;
+      const choice=pickScope('importNewRow','importExist','importMode');
+      let target=choice.scope||'';
+      try{
+        if(choice.mode==='new'){
+          if(!choice.name)throw new Error('请输入新会话名称');
+          const created=await apiPost('api/session/create',{alias:choice.name});target=created.scope;
+        }else if(!target)throw new Error('请选择要补充到的会话');
+        const result=await apiPost('api/import',{scope:target,raw:pendingRaw});
+        const ok=result.imported>0&&result.failed===0;
+        const msg=`导入完成：成功 ${result.imported} 条，重复 ${result.duplicates} 条，失败 ${result.failed} 条`;
+        pushToast(msg,ok);log(msg,ok);
+        $('importBox').style.display='none';pendingRaw=null;
+        await loadSessions();await load();
+      }catch(err){const msg=`导入失败：${err.message||err}`;pushToast(msg,false);log(msg,false);}
+    };
+    $('aiImport').onclick=()=>{$('aiText').value='';$('aiNewName').value='';fillImportSelects();$('aiBox').style.display='flex';};
+    $('aiCancel').onclick=()=>$('aiBox').style.display='none';
+    $('aiGo').onclick=async()=>{
+      const text=$('aiText').value.trim();
+      if(!text)return pushToast('请先粘贴要解析的文本',false);
+      const choice=pickScope('aiNewRow','aiExist','aiMode');
+      let target=choice.scope||'';
+      const pBox=$('aiProgress'),pFill=$('aiProgressFill'),pTxt=$('aiProgressText');
+      try{
+        if(choice.mode==='new'){
+          if(!choice.name)throw new Error('请输入新会话名称');
+          const created=await apiPost('api/session/create',{alias:choice.name});target=created.scope;
+        }else if(!target)throw new Error('请选择要补充到的会话');
+        pBox.classList.remove('hidden');
+        pFill.classList.add('indet');pFill.style.width='40%';
+        pTxt.textContent='AI 正在解析文本，识别记忆条目…';
+        $('aiGo').disabled=true;
+        const poll=async()=>{
+          try{
+            const p=await apiGet('api/ai_import_progress');
+            if(p&&p.phase==='writing'&&p.total>0){
+              pFill.classList.remove('indet');
+              pFill.style.width=Math.min(100,Math.round(p.done/p.total*100))+'%';
+              pTxt.textContent=`正在写入：${p.done} / ${p.total} 条（成功 ${p.ok}，重复 ${p.dup}，失败 ${p.failed}）`;
+            }
+          }catch(err){}
+        };
+        const pollTimer=setInterval(poll,700);poll();
+        let result;
+        try{
+          result=await withTimeout(bridge.apiPost('api/import_ai',{scope:target,text:text}),300000,'AI 导入');
+        }finally{
+          clearInterval(pollTimer);$('aiGo').disabled=false;
+        }
+        pFill.classList.remove('indet');pFill.style.width='100%';
+        const ok=result.imported>0&&result.failed===0;
+        const msg=`AI 导入完成：成功 ${result.imported} 条，重复 ${result.duplicates} 条，失败 ${result.failed} 条`;
+        pushToast(msg,ok);log(msg,ok);
+        const c=result.ai_context;
+        if(c){
+          const ctx=`AI 工作上下文｜供应商：${c.provider}\n本次解析文本：${c.text_chars} 字 → ${c.parsed} 条记忆\n—— 工作提示词（system）——\n${c.system_prompt}\n—— AI 原始返回（截断 2000 字）——\n${c.raw_output}`;
+          log(ctx,ok);
+        }
+        $('aiBox').style.display='none';pBox.classList.add('hidden');
+        await loadSessions();await load();
+      }catch(err){
+        const msg=`AI 导入失败：${err.message||err}`;pushToast(msg,false);log(msg,false);
+        pBox.classList.add('hidden');$('aiGo').disabled=false;
+      }
+    };
+    $('aiCfg').onclick=async()=>{
+      $('aiCfgBox').style.display='flex';
+      $('aiCfgHint').textContent='加载中…';
+      try{
+        const s=await apiGet('api/ai_settings');
+        const sel=$('aiCfgProvider');
+        sel.innerHTML='<option value="">跟随系统当前使用的供应商</option>'+
+          (s.providers||[]).map(p=>`<option value="${p.id}">${p.id}${p.model?`（${p.model}）`:''}${p.enable?'':'【未启用】'}</option>`).join('');
+        sel.value=s.provider_id||'';
+        if(s.provider_id&&sel.value!==s.provider_id){
+          sel.value='';
+          $('aiCfgHint').textContent=`配置的供应商「${s.provider_id}」不在当前列表中，已回退为跟随系统当前供应商。`;
+        }else{
+          const src={webui:'来自 WebUI「AI 配置」弹窗（优先于插件配置页的设置）',config:'来自插件配置页（在此弹窗保存后会覆盖它）',system:'跟随系统当前供应商'}[s.provider_source]||'跟随系统当前供应商';
+          $('aiCfgHint').textContent=`当前供应商生效来源：${src}。内置默认提示词会要求 AI 按「内容（严禁改动）+ 重要程度 0-5 + 标签 + 时间」的固定格式输出。`;
+        }
+        $('aiCfgPrompt').value=s.prompt||'';
+      }catch(err){$('aiCfgHint').textContent=`加载失败：${err.message||err}`;}
+    };
+    $('aiCfgCancel').onclick=()=>$('aiCfgBox').style.display='none';
+    $('aiCfgSave').onclick=async()=>{
+      try{
+        await apiPost('api/ai_settings/save',{provider_id:$('aiCfgProvider').value,prompt:$('aiCfgPrompt').value});
+        $('aiCfgBox').style.display='none';pushToast('AI 配置已保存');log('保存 AI 配置（供应商与工作提示词）');
+      }catch(err){const msg=`保存 AI 配置失败：${err.message||err}`;pushToast(msg,false);log(msg,false);}
+    };
+    $('addSave').onclick=async()=>{const context=$('addContent').value.trim();if(!context)return pushToast('请输入记忆内容',false);if(!scope())return pushToast('请先选择会话',false);try{const result=await apiPost('api/add',{scope:scope(),context:context,tags:$('addTags').value,kind:$('addKind').value,star:Number($('addStar').value)||0,time:$('addTime').value?toIso($('addTime').value):''});pushToast(`已添加记忆 #${result.item.id}`);log(`手动添加${result.item.kind==='prompt'?'提示':'长期'}记忆 #${result.item.id}`);$('addContent').value='';$('addTags').value='';$('addStar').value='0';$('addTime').value='';await load();}catch(e){const msg=`添加失败：${e.message||e}`;pushToast(msg,false);log(msg,false);}};
+    await bridge.ready(); await loadSessions();
+  </script>
+</body>
+</html>

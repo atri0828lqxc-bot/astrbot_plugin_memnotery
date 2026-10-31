@@ -1,0 +1,32 @@
+{
+  "enable_prompt_memory": {
+    "description": "启用提示记忆",
+    "type": "bool",
+    "default": true,
+    "hint": "关闭后不再向每轮对话自动注入提示记忆，保存提示记忆的请求也会被拒绝"
+  },
+  "enable_memory": {
+    "description": "启用长期记忆",
+    "type": "bool",
+    "default": true,
+    "hint": "关闭后长期记忆的保存与检索工具失效，模型无法读写长期记忆"
+  },
+  "enable_ai_import": {
+    "description": "启用 AI 语义导入",
+    "type": "bool",
+    "default": false,
+    "hint": "开启后 WebUI 可用 AI 智能导入：调用当前 LLM 把任意格式的文本解析为记忆条目（内容严禁改动，仅判断时间、标签与重要程度）。默认关闭以避免额外 token 消耗"
+  },
+  "ai_provider_id": {
+    "description": "AI 导入使用的模型供应商（下拉选择，留空跟随系统当前供应商）",
+    "type": "string",
+    "default": "",
+    "hint": "下拉选择 AI 导入使用的供应商（列表由插件自动注入，保存后自动热重载生效）。留空则使用系统当前选择的聊天供应商；注意 WebUI 管理页「AI 配置」弹窗中保存过的选择优先于此处"
+  },
+  "ai_import_prompt": {
+    "description": "AI 导入工作提示词（留空使用内置默认）",
+    "type": "text",
+    "default": "",
+    "hint": "自定义 AI 解析记忆时的工作提示词。必须要求 AI 只输出固定 JSON 数组（content 严禁改动原文、star 重要程度 0-5、tags 标签、time 时间），留空使用内置默认提示词；WebUI「AI 配置」弹窗中的设置会覆盖此值"
+  }
+}

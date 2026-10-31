@@ -1,0 +1,6 @@
+name: astrbot_plugin_memory
+display_name: Memnotery
+desc: 会话记忆、提示记忆与垃圾箱管理插件
+version: 0.2.0
+author: GLM & GPT-5.4
+repo: https://github.com/
