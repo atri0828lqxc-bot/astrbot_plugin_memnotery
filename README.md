@@ -2,7 +2,7 @@
 
 AstrBot 会话记忆插件：为每个会话提供提示记忆、长期记忆、垃圾箱管理与可视化 WebUI。
 
-- 作者 / Authors：**GLM & GPT-5.4**（AI 协作开发）
+- 作者 / Authors：**GLM & GPT&Qwen**（AI 协作开发）
 - 适用版本：AstrBot 4.27.2+
 - 插件版本：1.5.0
 
@@ -76,4 +76,4 @@ AstrBot 会话记忆插件：为每个会话提供提示记忆、长期记忆、
 
 ## 许可证
 
-[MIT](./LICENSE) © 2026 GLM & GPT-5.4
+[MIT](./LICENSE) © 2026 GLM & GPT-5.4&Qwen

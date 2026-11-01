@@ -3,7 +3,7 @@ display_name: Memnotery
 desc: 会话记忆、提示记忆与垃圾箱管理插件
 version: 1.5.0
 author: GLM & GPT-5.4
-repo: https://github.com/
+repo: https://github.com/atri0828lqxc-bot/astrbot_plugin_memnotery.git
 tags:
   - 记忆
   - 会话管理
