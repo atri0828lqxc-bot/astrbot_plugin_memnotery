@@ -2,6 +2,7 @@ import asyncio
 import functools
 import json
 import os
+import shutil
 import sqlite3
 import re
 import threading
@@ -16,6 +17,7 @@ from astrbot.core.agent.message import TextPart
 from astrbot.api.star import Context, Star, register
 from astrbot.api.web import request
 from astrbot.core.config import AstrBotConfig
+from astrbot.core.utils.astrbot_path import get_astrbot_plugin_data_path
 from quart import request as quart_request
 
 
@@ -159,8 +161,12 @@ class MemnoteryStore:
             self.backup_dir.mkdir(parents=True, exist_ok=True)
             stamp = datetime.now().strftime("%Y%m%d-%H%M%S")
             dest = self.backup_dir / f"memnotery-{stamp}-{reason}.db"
-            with sqlite3.connect(str(dest)) as target:
+            target = sqlite3.connect(str(dest))
+            try:
                 self.db.backup(target)
+                target.commit()
+            finally:
+                target.close()  # 必须显式关闭，否则 Windows 上文件句柄占用导致备份无法清理
             backups = sorted(self.backup_dir.glob("memnotery-*.db"))
             for old in backups[:-5]:
                 old.unlink(missing_ok=True)
@@ -168,6 +174,13 @@ class MemnoteryStore:
         except Exception:
             logger.exception("Memnotery backup failed")
             return None
+
+    def close(self) -> None:
+        """关闭数据库连接，释放文件句柄（供插件 terminate 时调用）。"""
+        try:
+            self.db.close()
+        except Exception:
+            pass
 
     @_locked
     def register_scope(self, scope: str) -> None:
@@ -625,7 +638,7 @@ class MemnoteryPlugin(Star):
     def __init__(self, context: Context, config: AstrBotConfig = None):
         super().__init__(context)
         self.config = config or {}
-        data_dir = os.path.join(os.path.dirname(__file__), "data")
+        data_dir = self._resolve_data_dir()
         self.store = MemnoteryStore(os.path.join(data_dir, "memory.sqlite3"))
         self._ai_progress: dict | None = None
         self._inject_provider_options()
@@ -650,6 +663,45 @@ class MemnoteryPlugin(Star):
         context.register_web_api("/astrbot_plugin_memory/api/share", self.api_share, ["POST"], "Share session memories")
         context.register_web_api("/astrbot_plugin_memory/api/unshare", self.api_unshare, ["POST"], "Stop sharing session memories")
         context.register_web_api("/astrbot_plugin_memory/api/migrate", self.api_migrate, ["POST"], "Move session memories")
+
+    async def terminate(self):
+        """AstrBot 插件卸载/重载钩子：关闭数据库连接，避免 Windows 上文件句柄泄漏。"""
+        self.store.close()
+
+    def _resolve_data_dir(self) -> str:
+        """持久化数据统一存放于 data/plugin_data/astrbot_plugin_memory（审核规范）。
+        旧版本把数据库写在插件自身目录 data/ 下，这里一次性整体搬迁（含备份与 WAL）。"""
+        new_dir = os.path.join(get_astrbot_plugin_data_path(), "astrbot_plugin_memory")
+        if os.path.exists(os.path.join(new_dir, "memory.sqlite3")):
+            return new_dir
+        os.makedirs(new_dir, exist_ok=True)
+        old_dir = os.path.join(os.path.dirname(__file__), "data")
+        old_db = os.path.join(old_dir, "memory.sqlite3")
+        if not os.path.exists(old_db):
+            return new_dir
+        try:
+            conn = sqlite3.connect(old_db)
+            try:
+                conn.execute("PRAGMA wal_checkpoint(TRUNCATE)")
+            finally:
+                conn.close()
+        except Exception:
+            logger.exception("Memnotery wal checkpoint before migration failed")
+        for name in os.listdir(old_dir):
+            src = os.path.join(old_dir, name)
+            try:
+                if name == "memnotery.db" and os.path.isfile(src):
+                    os.remove(src)  # 旧版遗留空库，直接清理
+                    continue
+                shutil.move(src, os.path.join(new_dir, name))
+            except Exception:
+                logger.exception(f"Memnotery data migration failed for: {name}")
+        try:
+            os.rmdir(old_dir)
+            logger.info("Memnotery: migrated data dir to " + new_dir)
+        except OSError:
+            pass
+        return new_dir
 
     def _inject_provider_options(self) -> None:
         """把当前供应商列表动态注入配置页 schema，让 ai_provider_id 在配置页渲染为下拉框。
@@ -838,27 +890,28 @@ class MemnoteryPlugin(Star):
             return {"error": "scope is required"}, 400
         only_deleted = request.query.get("trash", "false").lower() == "true"
         kind = request.query.get("kind")
-        return {"items": self.store.search(scope, request.query.get("q", ""), kind=kind,
-                                              only_deleted=only_deleted, limit=100, include_key=True)}
+        return {"items": await asyncio.to_thread(
+            self.store.search, scope, request.query.get("q", ""), kind=kind,
+            only_deleted=only_deleted, limit=100, include_key=True)}
 
     async def api_update(self):
         data = await self._request_json()
         if "id" not in data:
             return {"error": "id is required"}, 400
-        ok = self.store.update(str(data.get("scope", "")), int(data["id"]), data.get("context"),
-                               data.get("tags"), data.get("star"), data.get("time"))
+        ok = await asyncio.to_thread(self.store.update, str(data.get("scope", "")), int(data["id"]),
+                                     data.get("context"), data.get("tags"), data.get("star"), data.get("time"))
         return {"ok": ok}, (200 if ok else 404)
 
     async def api_delete(self):
         data = await self._request_json()
         scope = str(data.get("scope", ""))
         if "row_ids" in data:
-            return {"deleted": self.store.remove_rows(scope, data["row_ids"])}
+            return {"deleted": await asyncio.to_thread(self.store.remove_rows, scope, data["row_ids"])}
         if "ids" in data:
-            return {"deleted": self.store.remove_many(scope, data["ids"])}
+            return {"deleted": await asyncio.to_thread(self.store.remove_many, scope, data["ids"])}
         if "id" not in data:
             return {"error": "id is required"}, 400
-        ok = self.store.remove(scope, int(data["id"]))
+        ok = await asyncio.to_thread(self.store.remove, scope, int(data["id"]))
         return {"ok": ok}, (200 if ok else 404)
 
     async def api_purge_selected(self):
@@ -878,11 +931,11 @@ class MemnoteryPlugin(Star):
     async def api_restore(self):
         data = await self._request_json()
         if "ids" in data:
-            return {"restored": self.store.restore_many(str(data.get("scope", "")), data["ids"])}
+            return {"restored": await asyncio.to_thread(self.store.restore_many, str(data.get("scope", "")), data["ids"])}
         if "row_id" not in data and "id" not in data:
             return {"error": "id or row_id is required"}, 400
-        ok = self.store.restore(str(data.get("scope", "")), int(data.get("id", 0)),
-                                int(data["row_id"]) if "row_id" in data else None)
+        ok = await asyncio.to_thread(self.store.restore, str(data.get("scope", "")), int(data.get("id", 0)),
+                                     int(data["row_id"]) if "row_id" in data else None)
         return {"ok": ok}, (200 if ok else 404)
 
     async def api_purge(self):
@@ -908,7 +961,9 @@ class MemnoteryPlugin(Star):
             star = int(data.get("star", 0) or 0)
         except (TypeError, ValueError):
             star = 0
-        item = self.store.add(scope, context_text, tags, star, kind, str(data.get("time")) if data.get("time") else None)
+        item = await asyncio.to_thread(
+            self.store.add, scope, context_text, tags, star, kind,
+            str(data.get("time")) if data.get("time") else None)
         return {"item": item}
 
     async def api_import(self):
@@ -1076,7 +1131,7 @@ class MemnoteryPlugin(Star):
         scope = str(request.query.get("scope", ""))
         if not scope:
             return {"error": "scope is required"}, 400
-        return {"items": self.store.export_data(scope)}
+        return {"items": await asyncio.to_thread(self.store.export_data, scope)}
 
     async def api_share(self):
         data = await self._request_json()

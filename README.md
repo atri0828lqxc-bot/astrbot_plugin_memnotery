@@ -4,7 +4,7 @@ AstrBot 会话记忆插件：为每个会话提供提示记忆、长期记忆、
 
 - 作者 / Authors：**GLM & GPT-5.4**（AI 协作开发）
 - 适用版本：AstrBot 4.27.2+
-- 插件版本：0.2.0
+- 插件版本：1.5.0
 
 ## 功能特性
 
@@ -72,7 +72,7 @@ AstrBot 会话记忆插件：为每个会话提供提示记忆、长期记忆、
 
 ## 安装
 
-将本目录放入 AstrBot 的 `data/plugins/astrbot_plugin_memory/`，重载插件即可。数据库文件位于插件目录 `data/memory.sqlite3`。
+将本目录放入 AstrBot 的 `data/plugins/astrbot_plugin_memory/`，重载插件即可。持久化数据（数据库与自动备份）位于 AstrBot 标准数据目录 `data/plugin_data/astrbot_plugin_memory/`；旧版本存放在插件目录 `data/` 下的数据会在插件启动时自动整体迁移过去，无需手动处理。
 
 ## 许可证
 
